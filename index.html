@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StickCre - New Emoji</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #ff9a8b, #ff6f61);
+            background-image: url('https://gifsec.com/wp-content/uploads/2022/10/cute-anime-girl-33.gif');
+            color: #fff;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ffeb3b;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.4);
+            animation: slideIn 1s ease-out;
+        }
+        #fileInput {
+            display: none;
+        }
+        #customFileButton {
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 1.5rem;
+            border: 2px solid #ffeb3b;
+            border-radius: 8px;
+            background-color: rgba(255, 165, 0, 0.8);
+            color: #7CFC00;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        #customFileButton:hover {
+            background-color: rgba(155, 245, 255, 0.9);
+            color: #f5f96f;
+            border-color: #ffcc00;
+            box-shadow: 0 0 6px rgba(255, 204, 0, 0.6);
+        }
+        #imagePreview {
+            border: 4px solid #ffeb3b;
+            background-color: #ff6f61;
+            width: 360px;
+            height: 360px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        #imagePreview img {
+            max-width: 359px;
+            max-height: 359px;
+        }
+        #shareButton {
+            background-color: #ffeb3b;
+            color: #ff6f61;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        #shareButton:hover {
+            background-color: #ffcc00;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-content {
+            background: #ff6f61;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+        .modal-content p {
+            margin: 0;
+            font-size: 1.3rem;
+            color: #ffeb3b;
+        }
+        .modal-content button {
+            background-color: #ffcc00;
+            color: #ff6f61;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .modal-content button:hover {
+            background-color: #ffeb3b;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Tạo Sticker Zalo</h1>
+    <button id="customFileButton">Chọn Tệp</button>
+    <input type="file" id="fileInput" accept="image/png, image/gif">
+    <div id="imagePreview">
+        <img id="previewImg">
+    </div>
+    <button id="shareButton">Chia Sẻ Sticker</button>
+    
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <p>Sticker đã được tải xuống. Mở Zalo và chia sẻ tệp này</p>
+            <button onclick="closeModal()">Đóng</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('customFileButton').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('previewImg');
+                img.src = e.target.result;
+
+                if (file.type === 'image/gif') {
+                    resizeGif(img);
+                } else {
+                    createStickerCanvas(img);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function resizeGif(img) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 360;
+            canvas.height = 360;
+            const ctx = canvas.getContext('2d');
+            const image = new Image();
+            image.onload = function() {
+                const scale = Math.min(359 / image.width, 359 / image.height);
+                const width = image.width * scale;
+                const height = image.height * scale;
+                const x = (360 - width) / 2;
+                const y = (360 - height) / 2;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(image, x, y, width, height);
+
+                img.src = canvas.toDataURL('image/gif');
+            };
+            image.src = img.src;
+        }
+
+        function createStickerCanvas(img) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 360;
+            canvas.height = 360;
+            const ctx = canvas.getContext('2d');
+            const image = new Image();
+            image.onload = function() {
+                const scale = Math.min(359 / image.width, 359 / image.height);
+                const width = image.width * scale;
+                const height = image.height * scale;
+                const x = (360 - width) / 2;
+                const y = (360 - height) / 2;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(image, x, y, width, height);
+
+                canvas.toBlob(blob => {
+                    const newImgSrc = URL.createObjectURL(blob);
+                    img.src = newImgSrc;
+                }, 'image/png');
+            };
+            image.src = img.src;
+        }
+
+        document.getElementById('shareButton').addEventListener('click', function() {
+            const img = document.getElementById('previewImg');
+            fetch(img.src)
+                .then(res => res.blob())
+                .then(blob => {
+                    const fileType = blob.type === 'image/gif' ? 'gif' : 'png';
+                    
+                    if (navigator.canShare && navigator.canShare({ files: [new File([blob], `sticker.${fileType}`, { type: blob.type })] })) {
+                        navigator.share({
+                            files: [new File([blob], `sticker.${fileType}`, { type: blob.type })],
+                            title: 'Sticker Zalo'
+                        }).then(() => {
+                            console.log('Chia sẻ thành công');
+                        }).catch(err => {
+                            console.error('Chia sẻ thất bại', err);
+                        });
+                    } else {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = `sticker.${fileType}`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+
+                        document.getElementById('modal').style.display = 'flex';
+                    }
+                })
+                .catch(err => {
+                    console.error('Không thể tải ảnh xuống', err);
+                });
+        });
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
