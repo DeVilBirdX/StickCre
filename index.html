@@ -131,6 +131,41 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        .footer {
+        position: absolute;
+        top: 15px; 
+        width: 100%;
+        font-size: 22px;
+        color: #f06f9f;
+        text-align: center;
+        margin: 0; 
+        }
+        .footer a {
+        color: cyan;
+        text-decoration: none;
+        font-weight: bold;
+        }
+        .footer a:hover {
+        color: #e64a19;
+        }
+        .WEB2-container {
+        position: absolute;
+        top: 5px;
+        left: 10px;
+        }
+        .WEB2-container button {
+        background-color: #ff5722;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 20px;
+        transition: background-color 0.3s ease;
+        }
+        .WEB2-container button:hover {
+        background-color: #e64a19;
+    }
     </style>
 </head>
 <body>
@@ -141,6 +176,11 @@
         <img id="previewImg">
     </div>
     <button id="shareButton">Chia Sẻ Sticker</button>
+    <div class="footer">
+    <p>🇻🇳 <a href="https://youtube.com/@mavuongdaccau" target="_blank">@Creator By Tulen Đặc Cầu 🇻🇳</a></p>
+    <div class="WEB2-container">
+    <button onclick="window.location.href='https://stickcre-gif.netlify.app/'">GIF-STICKER</button>
+</div>
     
     <!-- Modal -->
     <div id="modal" class="modal">
